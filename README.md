@@ -16,7 +16,7 @@
 
 ![浅色模式](docs/screenshots/dsh-pv-0.3.0-light.png)
 
-截图来自实际 DSH 页面。当前版本为 **0.3.3**，播放条改为悬浮覆盖，不再把输入区向上推。背景、轮播顺序和切换时间没有改动。
+截图来自实际 DSH 页面。当前版本为 **0.3.4**：播放条悬浮覆盖，不与输入区争空间；进入已有消息的会话时，输入区外圈让出底色、露出背景，各卡片自身表面保持不变。背景、轮播顺序和切换时间没有改动。
 
 ## 能做什么
 
@@ -32,10 +32,10 @@
 
 先确认 DSH Web 能正常启动，并且已经安装了 DSH 插件管理需要的 pnpm。这是 Web 界面的皮肤，不改变终端界面。
 
-下载 [0.3.3 安装包](release/dsh-skin-genshin-nicole-0.3.3.tgz)，不用解压。在安装包所在文件夹打开终端，运行：
+下载 [0.3.4 安装包](release/dsh-skin-genshin-nicole-0.3.4.tgz)，不用解压。在安装包所在文件夹打开终端，运行：
 
 ```powershell
-dsh plugin --profile web add "./dsh-skin-genshin-nicole-0.3.3.tgz"
+dsh plugin --profile web add "./dsh-skin-genshin-nicole-0.3.4.tgz"
 ```
 
 安装后重启 DSH，再刷新浏览器，背景就会出现：
@@ -44,7 +44,7 @@ dsh plugin --profile web add "./dsh-skin-genshin-nicole-0.3.3.tgz"
 dsh web
 ```
 
-如果下载的是整个仓库，在仓库根目录安装时，路径写成 `./release/dsh-skin-genshin-nicole-0.3.3.tgz`。如果你用的 profile 不叫 `web`，把命令里的 `web` 换成自己的名称，并用平时启动该 profile 的方式打开 DSH。
+如果下载的是整个仓库，在仓库根目录安装时，路径写成 `./release/dsh-skin-genshin-nicole-0.3.4.tgz`。如果你用的 profile 不叫 `web`，把命令里的 `web` 换成自己的名称，并用平时启动该 profile 的方式打开 DSH。
 
 安装成品不需要编译源码，也不需要为皮肤配置 API key。目前通过本地 `.tgz` 包安装，尚未发布到 npm。请先停用其他背景皮肤；如果装过 Nicole Lite，也请先卸载 Lite，避免两层背景叠在一起。
 

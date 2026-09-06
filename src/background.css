@@ -44,6 +44,11 @@ body[data-dsh-genshin-nicole] [data-input-backdrop] {
   background-color: transparent;
 }
 
+/* Reveal the background around the composer; keep each card's own surface. */
+body[data-dsh-genshin-nicole] [data-slot="conversation"] > [data-phase="active"] [data-composer-seat] {
+  background: transparent;
+}
+
 @media (max-width: 760px) {
   body[data-dsh-genshin-nicole] [data-nicole-layers],
   body[data-dsh-genshin-nicole][data-ds-dark-theme] [data-nicole-layers] {
