@@ -136,36 +136,57 @@ for (const { theme, width, height } of [
 }
 
 // Catches the real DSH conversation surface hiding an otherwise loaded image.
-test('floating player follows resized and replaced input cards and returns to the corner', async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' });
+test('floating player stays at the corner compact or turns vertical above the composer', async ({ page }) => {
   await openSkin(page);
-  await showActiveConversationFixture(page, '输入区尺寸与会话切换回归。');
   const controls = page.locator('[data-nicole-controls]');
+  const status = page.locator('[data-nicole-status]');
+  const mode = () => controls.getAttribute('data-nicole-mode');
+  await expect(mode()).resolves.toBe('full');
+  await expect(status).toBeVisible();
+
+  // An active composer owns the corner: drop the status text, keep the buttons.
+  await showActiveConversationFixture(page, '输入区尺寸与会话切换回归。');
+  await expect(mode()).resolves.toBe('compact');
+  await expect(status).toBeHidden();
+  await expect(controls).toHaveCSS('bottom', '10px');
+  const cardBox = await page.locator('[data-composer-card]').boundingBox();
+  const ctlBox = await controls.boundingBox();
+  expect(cardBox.x + cardBox.width, 'the compact bar must sit right of the composer card').toBeLessThan(ctlBox.x);
+  await page.getByRole('button', { name: '下一张背景', exact: true }).click();
+  await expect(page.locator('[data-nicole-background]')).toHaveAttribute('data-index', '1');
+
+  // Growing or replacing the input card must not push the compact bar around.
+  await page.locator('[data-composer-card]').evaluate(card => { card.style.minHeight = '280px'; });
+  await expect(controls).toHaveCSS('bottom', '10px');
+  await page.locator('[data-composer-card]').evaluate(card => {
+    const replacement = card.cloneNode(true);
+    replacement.style.minHeight = '150px';
+    card.replaceWith(replacement);
+  });
+  await expect(controls).toHaveCSS('bottom', '10px');
+  await expect(mode()).resolves.toBe('compact');
+
+  // Wide screens keep the full row at the corner.
+  await page.setViewportSize({ width: 1909, height: 905 });
+  await expect(mode()).resolves.toBe('full');
+  await expect(status).toBeVisible();
+  await expect(controls).toHaveCSS('bottom', '10px');
+
+  // A portrait composer owns the whole corner: become a slim column above it.
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(mode()).resolves.toBe('vertical');
+  await expect(controls).toHaveCSS('flex-direction', 'column');
+  await expect(status).toBeHidden();
   const gap = () => page.evaluate(() => {
     const card = document.querySelector('[data-composer-card]').getBoundingClientRect();
     const player = document.querySelector('[data-nicole-controls]').getBoundingClientRect();
     return Math.round(card.top - player.bottom);
   });
   await expect.poll(gap).toBe(8);
-  const card = page.locator('[data-composer-card]');
-  await card.evaluate(card => { card.style.minHeight = '280px'; });
-  await expect.poll(gap).toBe(8);
-  await card.evaluate(card => {
-    const replacement = card.cloneNode(true);
-    replacement.style.minHeight = '150px';
-    card.replaceWith(replacement);
-  });
-  await expect.poll(gap).toBe(8);
   await page.getByRole('button', { name: '下一张背景', exact: true }).click();
-  await expect(page.locator('[data-nicole-background]')).toHaveAttribute('data-index', '1');
-  await card.evaluate(card => { card.style.display = 'none'; });
-  await expect(controls).toHaveCSS('bottom', '10px');
-  await card.evaluate(card => { card.style.removeProperty('display'); });
-  await expect.poll(gap).toBe(8);
-  await page.setViewportSize({ width: 1909, height: 905 });
-  await expect(controls).toHaveCSS('bottom', '10px');
-  await page.setViewportSize({ width: 390, height: 844 });
-  await expect.poll(gap).toBe(8);
+  await expect(page.locator('[data-nicole-background]')).toHaveAttribute('data-index', '2');
+  await page.getByRole('button', { name: '暂停背景轮播', exact: true }).click();
+  await expect(page.locator('[data-nicole-controls]')).toHaveAttribute('data-paused', 'true');
 });
 
 test('the installed wallpaper is visible through the actual DSH conversation surface', async ({ page }) => {

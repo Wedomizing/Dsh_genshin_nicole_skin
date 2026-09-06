@@ -77,6 +77,17 @@ body[data-dsh-genshin-nicole] [data-nicole-controls] {
 }
 body[data-dsh-genshin-nicole][data-ds-dark-theme] [data-nicole-controls] { color: #c9cbd0; }
 body[data-dsh-genshin-nicole] [data-nicole-status] { padding-right: 5px; opacity: 0.75; }
+
+/* Compact and vertical modes hide the status so the player fits the corner or a
+   slim right-edge column without covering the composer card. */
+body[data-dsh-genshin-nicole] [data-nicole-controls][data-nicole-mode="compact"] [data-nicole-status],
+body[data-dsh-genshin-nicole] [data-nicole-controls][data-nicole-mode="vertical"] [data-nicole-status] { display: none; }
+body[data-dsh-genshin-nicole] [data-nicole-controls][data-nicole-mode="vertical"] {
+  flex-direction: column;
+  align-items: stretch;
+  padding: 5px 4px 4px;
+}
+body[data-dsh-genshin-nicole] [data-nicole-controls][data-nicole-mode="vertical"] button { min-width: 46px; }
 body[data-dsh-genshin-nicole] [data-nicole-controls] button {
   min-height: 30px;
   padding: 3px 7px;

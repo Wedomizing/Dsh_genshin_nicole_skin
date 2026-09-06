@@ -170,8 +170,16 @@ function floatingFixture() {
   const nativeRect = win.HTMLElement.prototype.getBoundingClientRect;
   win.HTMLElement.prototype.getBoundingClientRect = function () {
     if (this.hasAttribute('data-nicole-controls')) {
+      // CSS turns status off and stacks buttons per mode; mirror that sizing.
+      const mode = this.dataset.nicoleMode || 'full';
+      const sizes = {
+        full: { left: 740, right: 980, width: 240, height: 38 },
+        compact: { left: 817, right: 980, width: 163, height: 38 },
+        vertical: { left: 913, right: 980, width: 67, height: 104 },
+      };
+      const size = sizes[mode];
       const bottom = 800 - (parseFloat(this.style.bottom) || 10);
-      return { left: 740, right: 980, top: bottom - 38, bottom, width: 240, height: 38 };
+      return { left: size.left, right: size.right, width: size.width, height: size.height, top: bottom - size.height, bottom };
     }
     return nativeRect.call(this);
   };
@@ -193,8 +201,11 @@ test('floating controls follow late and replaced composers without changing host
   const cleanup = mountBackground(f.doc, frames, css, options(f.doc));
   await f.tick();
   const controls = f.doc.querySelector('[data-nicole-controls]');
+  assert.equal(controls.dataset.nicoleMode, 'full', 'no composer card keeps the full bar at the corner');
+  assert.equal(controls.style.bottom, '10px');
   f.doc.querySelector('#root').append(f.card);
   await f.tick();
+  assert.equal(controls.dataset.nicoleMode, 'vertical', 'a card that owns the corner switches to the slim column');
   assert.equal(controls.style.bottom, '168px', 'float eight pixels above an overlapping input card');
   assert.equal(f.card.getAttribute('style'), null, 'never reposition the host card');
   f.move({ left: 500, right: 980, top: 500, bottom: 780, width: 480, height: 280 });
@@ -203,6 +214,7 @@ test('floating controls follow late and replaced composers without changing host
   assert.equal(controls.style.bottom, '308px');
   f.card.remove(); await f.tick();
   assert.equal(controls.style.bottom, '10px', 'return to the corner after a conversation disappears');
+  assert.equal(controls.dataset.nicoleMode, 'full');
   f.doc.querySelector('#root').append(f.card); await f.tick();
   assert.equal(controls.style.bottom, '308px', 'rebind a composer on conversation change');
   cleanup(); f.dom.window.close();
