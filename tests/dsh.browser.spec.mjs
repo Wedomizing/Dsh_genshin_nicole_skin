@@ -26,6 +26,100 @@ async function openSkin(page) {
   return image;
 }
 
+// Exercise the installed host's real active-phase CSS without a model/API key.
+// Only the conversation content/state is simulated; never override its layering.
+async function showActiveConversationFixture(page, text) {
+  await page.locator('[data-slot="conversation"] > [data-phase]').evaluate((root, text) => {
+    root.dataset.phase = 'active';
+    // Active DSH drops hero spacing and its heading/workspace row. Keeping them
+    // would conceal collisions with the native send/stop button at the bottom.
+    const seat = root.querySelector('[data-composer-seat]');
+    const inputBar = seat.querySelector('[data-composer-card]').parentElement;
+    for (const node of seat.querySelectorAll('[class]')) {
+      for (const name of [...node.classList]) {
+        if (name.endsWith('_composerHero') || name.endsWith('_hero')) node.classList.remove(name);
+      }
+    }
+    for (const sibling of [...inputBar.parentElement.children]) {
+      if (sibling !== inputBar) sibling.remove();
+    }
+    const scroll = root.querySelector('[data-conversation-scroll]');
+    scroll.querySelector('[data-nicole-test-conversation]')?.remove();
+    const content = document.createElement('article');
+    content.setAttribute('data-nicole-test-conversation', '');
+    content.textContent = text;
+    content.style.cssText = 'flex: none; min-height: 150vh; padding: 32px;';
+    scroll.prepend(content);
+    scroll.scrollTop = scroll.scrollHeight;
+  }, text);
+  await expect(page.locator('[data-composer-seat]')).toHaveCSS('position', 'sticky');
+}
+
+for (const { theme, width, height } of [
+  { theme: '浅色', width: 1909, height: 905 },
+  { theme: '深色', width: 1909, height: 905 },
+  { theme: '浅色', width: 1440, height: 960 },
+  { theme: '深色', width: 390, height: 844 },
+]) {
+  test(`playback controls stay clickable above active conversation surfaces, below Settings (${theme}, ${width}px)`, async ({ page }) => {
+    await page.setViewportSize({ width, height });
+    await openSkin(page);
+    if (width < 760) await page.getByRole('button', { name: '打开侧边栏', exact: true }).click();
+    await page.getByRole('button', { name: '设置', exact: true }).click();
+    await page.getByRole('button', { name: theme, exact: true }).click();
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    if (width < 760) await page.getByRole('button', { name: '收起侧边栏', exact: true }).click();
+
+    const background = page.locator('[data-nicole-background]');
+    const next = page.getByRole('button', { name: '下一张背景', exact: true });
+    const previous = page.getByRole('button', { name: '上一张背景', exact: true });
+    await page.getByRole('button', { name: '暂停背景轮播', exact: true }).click();
+    await next.click();
+    await expect(background).toHaveAttribute('data-phase', 'idle');
+    await expect(background).toHaveAttribute('data-index', '1');
+
+    await showActiveConversationFixture(page, '测试会话 A：已有消息。');
+    // Visibility alone misses an opaque, click-intercepting composer above us.
+    // A normal click (no force) must reach the button and change the image.
+    await next.click({ timeout: 3000 });
+    await expect(background).toHaveAttribute('data-phase', 'idle');
+    await expect(background).toHaveAttribute('data-index', '2');
+
+    const sendBox = await page.getByRole('button', { name: '发送消息', exact: true }).boundingBox();
+    const controlsBox = await page.locator('[data-nicole-controls]').boundingBox();
+    expect(sendBox).not.toBeNull();
+    expect(controlsBox).not.toBeNull();
+    expect(
+      sendBox.x < controlsBox.x + controlsBox.width && sendBox.x + sendBox.width > controlsBox.x &&
+      sendBox.y < controlsBox.y + controlsBox.height && sendBox.y + sendBox.height > controlsBox.y,
+      'background controls must not cover the native send/stop button',
+    ).toBe(false);
+
+    await showActiveConversationFixture(page, '测试会话 B：切换后的消息。');
+    await previous.click({ timeout: 3000 });
+    await expect(background).toHaveAttribute('data-phase', 'idle');
+    await expect(background).toHaveAttribute('data-index', '1');
+    await page.getByRole('button', { name: '继续背景轮播', exact: true }).click();
+    await page.getByRole('button', { name: '暂停背景轮播', exact: true }).click();
+
+    if (width < 760) await page.getByRole('button', { name: '打开侧边栏', exact: true }).click();
+    await page.getByRole('button', { name: '设置', exact: true }).click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+    expect(await next.evaluate(button => {
+      const rect = button.getBoundingClientRect();
+      return button.contains(document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2));
+    }), 'the modal must cover the controls, not allow click-through').toBe(false);
+    await page.getByRole('combobox', { name: '尼可背景切换间隔', exact: true }).selectOption('5');
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    if (width < 760) await page.getByRole('button', { name: '收起侧边栏', exact: true }).click();
+    await next.click({ timeout: 3000 });
+    await expect(background).toHaveAttribute('data-phase', 'idle');
+    await expect(background).toHaveAttribute('data-index', '2');
+  });
+}
+
 // Catches the real DSH conversation surface hiding an otherwise loaded image.
 test('the installed wallpaper is visible through the actual DSH conversation surface', async ({ page }) => {
   const errors = [];
