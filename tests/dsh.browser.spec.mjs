@@ -40,9 +40,11 @@ async function showActiveConversationFixture(page, text) {
         if (name.endsWith('_composerHero') || name.endsWith('_hero')) node.classList.remove(name);
       }
     }
-    for (const sibling of [...inputBar.parentElement.children]) {
-      if (sibling !== inputBar) sibling.remove();
+    const stack = inputBar.closest('[class*="_composerStack"]');
+    for (const sibling of [...stack.children]) {
+      if (!sibling.contains(inputBar)) sibling.remove();
     }
+    inputBar.querySelector('[role="textbox"]').innerHTML = '<p><br></p>';
     const scroll = root.querySelector('[data-conversation-scroll]');
     scroll.querySelector('[data-nicole-test-conversation]')?.remove();
     const content = document.createElement('article');
@@ -80,6 +82,19 @@ for (const { theme, width, height } of [
     await expect(background).toHaveAttribute('data-index', '1');
 
     await showActiveConversationFixture(page, '测试会话 A：已有消息。');
+    const nativeGeometry = await page.locator('[data-composer-card]').evaluate(card => {
+      // Removing the skin scope must not put its decorative elements into flow.
+      const decoration = [...document.querySelectorAll('[data-nicole-background], [data-nicole-controls]')];
+      for (const element of decoration) element.style.setProperty('display', 'none', 'important');
+      const scoped = document.body.getAttribute('data-dsh-genshin-nicole');
+      document.body.removeAttribute('data-dsh-genshin-nicole');
+      const box = card.getBoundingClientRect().toJSON();
+      document.body.setAttribute('data-dsh-genshin-nicole', scoped ?? '');
+      for (const element of decoration) element.style.removeProperty('display');
+      return box;
+    });
+    expect(await page.locator('[data-composer-card]').evaluate(card => card.getBoundingClientRect().toJSON()),
+      'floating controls must not push the native composer upward').toEqual(nativeGeometry);
     // Visibility alone misses an opaque, click-intercepting composer above us.
     // A normal click (no force) must reach the button and change the image.
     await next.click({ timeout: 3000 });
@@ -121,6 +136,38 @@ for (const { theme, width, height } of [
 }
 
 // Catches the real DSH conversation surface hiding an otherwise loaded image.
+test('floating player follows resized and replaced input cards and returns to the corner', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await openSkin(page);
+  await showActiveConversationFixture(page, '输入区尺寸与会话切换回归。');
+  const controls = page.locator('[data-nicole-controls]');
+  const gap = () => page.evaluate(() => {
+    const card = document.querySelector('[data-composer-card]').getBoundingClientRect();
+    const player = document.querySelector('[data-nicole-controls]').getBoundingClientRect();
+    return Math.round(card.top - player.bottom);
+  });
+  await expect.poll(gap).toBe(8);
+  const card = page.locator('[data-composer-card]');
+  await card.evaluate(card => { card.style.minHeight = '280px'; });
+  await expect.poll(gap).toBe(8);
+  await card.evaluate(card => {
+    const replacement = card.cloneNode(true);
+    replacement.style.minHeight = '150px';
+    card.replaceWith(replacement);
+  });
+  await expect.poll(gap).toBe(8);
+  await page.getByRole('button', { name: '下一张背景', exact: true }).click();
+  await expect(page.locator('[data-nicole-background]')).toHaveAttribute('data-index', '1');
+  await card.evaluate(card => { card.style.display = 'none'; });
+  await expect(controls).toHaveCSS('bottom', '10px');
+  await card.evaluate(card => { card.style.removeProperty('display'); });
+  await expect.poll(gap).toBe(8);
+  await page.setViewportSize({ width: 1909, height: 905 });
+  await expect(controls).toHaveCSS('bottom', '10px');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect.poll(gap).toBe(8);
+});
+
 test('the installed wallpaper is visible through the actual DSH conversation surface', async ({ page }) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));

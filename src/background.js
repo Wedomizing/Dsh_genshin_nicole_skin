@@ -1,4 +1,5 @@
 import { createPlaylist } from './playlist.js';
+import { positionFloatingControls } from './floating-controls.js';
 import { createIntervalPreference, readPlaybackPreference, savePlaybackPreference } from './preferences.js';
 
 const instanceKey = Symbol.for('dsh-skin-genshin-nicole.background');
@@ -52,6 +53,7 @@ export function mountBackground(doc, frames, cssText, options = {}) {
   body.prepend(background);
   body.append(controls);
   body.setAttribute(scope, '');
+  const disposePosition = positionFloatingControls(doc, controls);
 
   function preload(entry) {
     return new Promise((accept, reject) => {
@@ -134,6 +136,7 @@ export function mountBackground(doc, frames, cssText, options = {}) {
   function dispose() {
     if (disposed) return;
     disposed = true;
+    disposePosition();
     unsubscribeInterval();
     if (!options.intervalPreference) intervalPreference.dispose();
     player.dispose();

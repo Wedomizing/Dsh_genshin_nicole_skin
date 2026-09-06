@@ -160,3 +160,69 @@ test('shared interval changes update the status without changing the frame or pa
   assert.equal(doc.documentElement.outerHTML, after);
   preference.dispose(); dom.window.close();
 });
+
+function floatingFixture() {
+  const dom = fixture(), win = dom.window, doc = win.document;
+  Object.defineProperty(win, 'innerHeight', { value: 800, configurable: true });
+  const callbacks = new Map(); let id = 0;
+  win.requestAnimationFrame = callback => { callbacks.set(++id, callback); return id; };
+  win.cancelAnimationFrame = key => callbacks.delete(key);
+  const nativeRect = win.HTMLElement.prototype.getBoundingClientRect;
+  win.HTMLElement.prototype.getBoundingClientRect = function () {
+    if (this.hasAttribute('data-nicole-controls')) {
+      const bottom = 800 - (parseFloat(this.style.bottom) || 10);
+      return { left: 740, right: 980, top: bottom - 38, bottom, width: 240, height: 38 };
+    }
+    return nativeRect.call(this);
+  };
+  const card = doc.createElement('div'); card.setAttribute('data-composer-card', '');
+  let rectangle = { left: 500, right: 980, top: 640, bottom: 780, width: 480, height: 140 };
+  card.getBoundingClientRect = () => rectangle;
+  const tick = async () => {
+    await flush();
+    const pending = [...callbacks.values()]; callbacks.clear();
+    pending.forEach(callback => callback(0));
+    await flush();
+  };
+  return { dom, win, doc, card, tick, move: value => { rectangle = value; } };
+}
+
+test('floating controls follow late and replaced composers without changing host layout', async t => {
+  const f = floatingFixture();
+  t.after(() => f.dom.window.close());
+  const cleanup = mountBackground(f.doc, frames, css, options(f.doc));
+  await f.tick();
+  const controls = f.doc.querySelector('[data-nicole-controls]');
+  f.doc.querySelector('#root').append(f.card);
+  await f.tick();
+  assert.equal(controls.style.bottom, '168px', 'float eight pixels above an overlapping input card');
+  assert.equal(f.card.getAttribute('style'), null, 'never reposition the host card');
+  f.move({ left: 500, right: 980, top: 500, bottom: 780, width: 480, height: 280 });
+  f.win.dispatchEvent(new f.win.Event('resize'));
+  await f.tick();
+  assert.equal(controls.style.bottom, '308px');
+  f.card.remove(); await f.tick();
+  assert.equal(controls.style.bottom, '10px', 'return to the corner after a conversation disappears');
+  f.doc.querySelector('#root').append(f.card); await f.tick();
+  assert.equal(controls.style.bottom, '308px', 'rebind a composer on conversation change');
+  cleanup(); f.dom.window.close();
+});
+
+test('floating controls leave a non-overlapping card alone and cancel queued work on disposal', async t => {
+  const f = floatingFixture();
+  t.after(() => f.dom.window.close());
+  f.move({ left: 100, right: 600, top: 640, bottom: 780, width: 500, height: 140 });
+  f.doc.querySelector('#root').append(f.card);
+  const cleanup = mountBackground(f.doc, frames, css, options(f.doc));
+  await f.tick();
+  const controls = f.doc.querySelector('[data-nicole-controls]');
+  assert.equal(controls.style.bottom, '10px');
+  f.win.dispatchEvent(new f.win.Event('resize'));
+  cleanup();
+  const before = f.doc.documentElement.outerHTML;
+  await f.tick();
+  f.win.dispatchEvent(new f.win.Event('resize')); await f.tick();
+  assert.equal(f.doc.documentElement.outerHTML, before);
+  assert.equal(controls.style.bottom, '10px');
+  f.dom.window.close();
+});

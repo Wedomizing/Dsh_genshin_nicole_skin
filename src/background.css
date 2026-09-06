@@ -44,13 +44,6 @@ body[data-dsh-genshin-nicole] [data-input-backdrop] {
   background-color: transparent;
 }
 
-/* Reserve a separate bottom row once chatting. Without it a raised player can
-   cover send/stop on narrow columns, especially before usage statistics exist. */
-body[data-dsh-genshin-nicole] [data-slot="conversation"] > [data-phase="active"] {
-  box-sizing: border-box;
-  padding-bottom: 52px;
-}
-
 @media (max-width: 760px) {
   body[data-dsh-genshin-nicole] [data-nicole-layers],
   body[data-dsh-genshin-nicole][data-ds-dark-theme] [data-nicole-layers] {

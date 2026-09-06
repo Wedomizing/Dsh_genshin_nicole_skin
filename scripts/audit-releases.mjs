@@ -49,6 +49,8 @@ for (const [name, want] of [
   ['dsh-skin-genshin-nicole-0.3.0-source.zip', 'e5626606ad34aaa7327733d8844054b0fb1330b239194c0ea1628d7f846b244e'],
   ['dsh-skin-genshin-nicole-0.3.1.tgz', '5a295ddc436642c07bd335689e9f3af9e81a52f6eac720317830734ead281744'],
   ['dsh-skin-genshin-nicole-0.3.1-github-ready.zip', '393a63406b0c3781f7d0a5983b18b3eaec60f839b605e06d0c8e82ba5ff29483'],
+  ['dsh-skin-genshin-nicole-0.3.2.tgz', '589724e81a7e982c1967888ef2835f2e13bc4556d933d158c8a0382f3ec2e88c'],
+  ['dsh-skin-genshin-nicole-0.3.2-github-ready.zip', '1896e51fcc4c14b5edbe4c039c0b819dd5e4e5fed9ac65506dbc25ff40ba6534'],
 ]) {
   const file = resolve(root, 'release', name);
   // Historical archives are local backups, not part of a clean repository clone.
