@@ -1,0 +1,177 @@
+{
+  "source": "https://www.bilibili.com/video/BV1cX516vEu8/?p=1",
+  "crop": {
+    "left": 0,
+    "top": 108,
+    "width": 1920,
+    "height": 864
+  },
+  "processing": "Remove 108 px from top and bottom; retain original interior pixels. Lossless PNG masters and quality-94 WebP delivery copies. No repainting.",
+  "frames": [
+    {
+      "order": 1,
+      "timestamp": "00:17",
+      "requestedSeconds": 17,
+      "sourceFile": "nicole-pv-01-00m17s.png",
+      "sourceSha256": "bb703f3ddedd7fcd5568c90c5c1ac5dd318aa229807e017de5c57b4f6af46a76",
+      "png": "nicole-pv-01-00m17s.png",
+      "pngSha256": "9fc75cdd7573405cf420df5ca0ffed3028d416c5613ec9c1c7bcc883dac64604",
+      "webp": "nicole-pv-01-00m17s.webp",
+      "webpSha256": "bff127cd3fd702960e56ab98c16c37e6175d14ca4bfc6c3a8c1c73891cb09ea3"
+    },
+    {
+      "order": 2,
+      "timestamp": "00:28",
+      "requestedSeconds": 28,
+      "sourceFile": "nicole-pv-02-00m28s.png",
+      "sourceSha256": "e48cc9d997865f83ed650d7502faaf359034789fd9ad034c8f1f1614aacd67ce",
+      "png": "nicole-pv-02-00m28s.png",
+      "pngSha256": "a455e2f05f910545c67500442ba2f72b986a707a6cb84511f86fe47a22b1529b",
+      "webp": "nicole-pv-02-00m28s.webp",
+      "webpSha256": "22538af7ff37acab277e0cd8f2aa2d0afe29dd77bcf693d653c6e0000f142659"
+    },
+    {
+      "order": 3,
+      "timestamp": "00:40",
+      "requestedSeconds": 40,
+      "sourceFile": "nicole-pv-03-00m40s.png",
+      "sourceSha256": "0b05649499f0119ec23b49564238d3e7e3dcca2523196123968240a052e593b0",
+      "png": "nicole-pv-03-00m40s.png",
+      "pngSha256": "63b9b19719d59574136ccd4d4ccbb8d1277c68d5e5f8d98cb7f86f2cf6734660",
+      "webp": "nicole-pv-03-00m40s.webp",
+      "webpSha256": "a2403cd5ae8e8cdacba5acaf2f806eb8f04a422bf1fc5643dae5ec72faf592eb"
+    },
+    {
+      "order": 4,
+      "timestamp": "00:49",
+      "requestedSeconds": 49,
+      "sourceFile": "nicole-pv-04-00m49s.png",
+      "sourceSha256": "45c7e8fd102173af6b819f361524bd423649aa654b11edc1652999902bcd28c2",
+      "png": "nicole-pv-04-00m49s.png",
+      "pngSha256": "c5e8e1ad0aee1bc9037187766debeb1deeecbeb185403e10861ed6f8ba8ac411",
+      "webp": "nicole-pv-04-00m49s.webp",
+      "webpSha256": "62f5e27c2f3679ca622b9f99f61cbd359d6a9b4d049fd2dfc8dd8c09ad2acbe4"
+    },
+    {
+      "order": 5,
+      "timestamp": "00:55",
+      "requestedSeconds": 55,
+      "sourceFile": "nicole-pv-05-00m55s.png",
+      "sourceSha256": "e7ee8444729ea21a83e466287f2a1d75324529612db87d33e1a9dd8a12a84dce",
+      "png": "nicole-pv-05-00m55s.png",
+      "pngSha256": "4be6847e2d6e2a580f34a06958cb3d32838690eaa95e753dfde55623b2028ed6",
+      "webp": "nicole-pv-05-00m55s.webp",
+      "webpSha256": "2c9b619555c0960369f8d5a17234da01069b45833ab5bbde91b55bb14b90ffa0"
+    },
+    {
+      "order": 6,
+      "timestamp": "01:02",
+      "requestedSeconds": 62,
+      "sourceFile": "nicole-pv-06-01m02s.png",
+      "sourceSha256": "6658a471e5366addd54599d881c272b66819284d7d42c72fa17a38bbbef5a1ee",
+      "png": "nicole-pv-06-01m02s.png",
+      "pngSha256": "5f8eefa6423ee4cac82459f4d55c415d8b46b0b83eccd78a4d78ad3094d55aec",
+      "webp": "nicole-pv-06-01m02s.webp",
+      "webpSha256": "8d04a2a10349eb4217b150771f67f72210f977bab717a2453b4415af41c98b08"
+    },
+    {
+      "order": 7,
+      "timestamp": "01:17",
+      "requestedSeconds": 77,
+      "sourceFile": "nicole-pv-07-01m17s.png",
+      "sourceSha256": "1de7824eac945eb1ac66927166866d527314422e8fd924cef9b2ecda6afc60d6",
+      "png": "nicole-pv-07-01m17s.png",
+      "pngSha256": "5c42dc37661dd747e04ed185ac98bde804c5a3c2a7d8f6e121c84bf307adf66c",
+      "webp": "nicole-pv-07-01m17s.webp",
+      "webpSha256": "6e1598d2801c81fc8a291213941dad2dfa3bcb3e4843c6aace1018c87033f682"
+    },
+    {
+      "order": 8,
+      "timestamp": "01:18",
+      "requestedSeconds": 78,
+      "sourceFile": "nicole-pv-08-01m18s.png",
+      "sourceSha256": "6e7fe5d454c231f5ef671330f1d78ebfbff11044cd59ed942c96aae74302fdac",
+      "png": "nicole-pv-08-01m18s.png",
+      "pngSha256": "371b84efac11b4f3cb791d74cf59da7e2b63dbc56afee126087074c1b23da9b3",
+      "webp": "nicole-pv-08-01m18s.webp",
+      "webpSha256": "b97d93b321c3ced9a79951d24fd501b3425e1817ee7a992b78a622de2c8538a1"
+    },
+    {
+      "order": 9,
+      "timestamp": "01:26",
+      "requestedSeconds": 86,
+      "sourceFile": "nicole-pv-09-01m26s.png",
+      "sourceSha256": "cb53242d82f6a2c5fd414ebdfbc257b6ef7995fac74465f4757b70e7f718e7bf",
+      "png": "nicole-pv-09-01m26s.png",
+      "pngSha256": "ec5c01ef22963dedb612d8f77cbb7329fb50b9940168a28a9e00776d8107b46b",
+      "webp": "nicole-pv-09-01m26s.webp",
+      "webpSha256": "6b566c2eee25e424fd159eccfb0adfe88318929af5294d7de1f116de3119a302"
+    },
+    {
+      "order": 10,
+      "timestamp": "01:30",
+      "requestedSeconds": 90,
+      "sourceFile": "nicole-pv-10-01m30s.png",
+      "sourceSha256": "220043964f3c98df7dc71c1e446089a802fd3175fef0da46b092f129d65b9080",
+      "png": "nicole-pv-10-01m30s.png",
+      "pngSha256": "cd10ad7d5b1a1162d63fd776289096fd71df780d639f8ea9194cc6947b438c58",
+      "webp": "nicole-pv-10-01m30s.webp",
+      "webpSha256": "a02ffe4f71e455905214dd3d3bc288fee532aaded184336bcd9e913704816024"
+    },
+    {
+      "order": 11,
+      "timestamp": "01:31",
+      "requestedSeconds": 91,
+      "sourceFile": "nicole-pv-11-01m31s.png",
+      "sourceSha256": "8bad677fa3c22af49ffcd6897d39147b1a499417b118ef8dd301e6d44e1dec9c",
+      "png": "nicole-pv-11-01m31s.png",
+      "pngSha256": "d17e12205092ebadb168674d8e95ad25642262e46fd928c356573a4389b04349",
+      "webp": "nicole-pv-11-01m31s.webp",
+      "webpSha256": "eb292db71fa18c0b6c77864cf7e4082bec4861e0f2b01fbd2f58f3368362f1cd"
+    },
+    {
+      "order": 12,
+      "timestamp": "01:40",
+      "requestedSeconds": 100,
+      "sourceFile": "nicole-pv-12-01m40s.png",
+      "sourceSha256": "884c3f672df9fa60640be80f4ea5922384e1ea0b0a1a6ac759c5231e19beadc0",
+      "png": "nicole-pv-12-01m40s.png",
+      "pngSha256": "f39f26a98148b6e3ef660cb5ee9e42e39664f2f342a66f6e5097f73f2f256671",
+      "webp": "nicole-pv-12-01m40s.webp",
+      "webpSha256": "08a278b9f566939d3135fdd44611fb001e69578e2e45fc0de3d3b82e03efddc3"
+    },
+    {
+      "order": 13,
+      "timestamp": "01:44",
+      "requestedSeconds": 104,
+      "sourceFile": "nicole-pv-13-01m44s.png",
+      "sourceSha256": "86ba35deae11d77e64b6c6facb0e2b75c4262c778db319460cf4e629ddbd4915",
+      "png": "nicole-pv-13-01m44s.png",
+      "pngSha256": "e640d0fd1caf7ae72b4706356d8891ef6bff0d6f7883cb2d36ff6eebbad238d3",
+      "webp": "nicole-pv-13-01m44s.webp",
+      "webpSha256": "ce70f980952cf3a6dc5b6a5a1b1451d63a511040f1dd20f7098ff9d6364c914f"
+    },
+    {
+      "order": 14,
+      "timestamp": "01:47",
+      "requestedSeconds": 107,
+      "sourceFile": "nicole-pv-14-01m47s.png",
+      "sourceSha256": "5b2de65123ca199cf8b1b97346186b43513b532538099a1df86e0f853dfb6de8",
+      "png": "nicole-pv-14-01m47s.png",
+      "pngSha256": "7bee40f3528fa542b559a798d67addec3f7272b05b815e78a70db029d5b6f569",
+      "webp": "nicole-pv-14-01m47s.webp",
+      "webpSha256": "ed494ddaa70913c826a45060a605e4615573bb06fe37a1f7503452dd47aea901"
+    },
+    {
+      "order": 15,
+      "timestamp": "01:51",
+      "requestedSeconds": 111,
+      "sourceFile": "nicole-pv-15-01m51s.png",
+      "sourceSha256": "90d00e97702e277315a96cf3766f9e5f8cf4aa882149bc878f37b6e4e8ed39c1",
+      "png": "nicole-pv-15-01m51s.png",
+      "pngSha256": "28039adad9aef2b6f9d2e37ac8f4b454f817b16f9b3f4f2f3e7970b8fc751c32",
+      "webp": "nicole-pv-15-01m51s.webp",
+      "webpSha256": "16cc10bd72ba95f998e48bf0febd89fdfa6bd23745d3e1ec41ba3b771d30ce68"
+    }
+  ]
+}

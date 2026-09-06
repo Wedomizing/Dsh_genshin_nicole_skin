@@ -1,0 +1,49 @@
+# 开发与测试
+
+## 代码位置
+
+- `src/frames.js`：轮播顺序，共 14 张。
+- `src/playlist.js`：前后切换、计时、暂停和预加载。
+- `src/background.js`、`src/background.css`：背景图层、淡入淡出、播放按钮和显示强度。
+- `src/preferences.js`：浏览器本地偏好和旧版播放位置迁移。
+- `src/settings.js`：DSH 通用设置里的间隔选项，使用宿主提供的 React。
+- `src/client.js`、`src/index.js`：客户端和插件入口。
+
+前后两层图片叠放，新图淡入时旧图保持在底下，避免过渡到一半时突然变暗。普通切换为两秒，减少动态效果模式下直接切图。皮肤不调用模型，也不请求远程图片。
+
+## 构建
+
+需要 Node.js 22.19 或更新版本。
+
+```powershell
+npm ci
+npm test
+npm run pack:release
+```
+
+普通构建使用已有 WebP，不修改图片。需要重做裁切时运行 `npm run assets:prepare`；该步骤保留原始 PNG。`lib/client.js` 内嵌图片和样式，安装包无需附带原视频、源素材或开发依赖。
+
+修改并分发安装包时请递增版本号，避免 pnpm 复用同名、同版本的旧包缓存。0.3.1 仅整理发布内容，皮肤显示与轮播逻辑没有改动。
+
+## 真实 DSH 测试
+
+需要本机 Chrome 和 pnpm，首次准备隔离环境：
+
+```powershell
+node scripts/setup-lab.mjs
+npm install --prefix .lab/runtime
+npm run pack:release
+npm run verify:dsh
+```
+
+测试只使用项目内 `.lab/` 下的独立 DSH 配置和 `127.0.0.1:3091`，不使用日常 DSH 配置；请保持这个端口空闲。脚本会实际安装包、核对安装内容、运行浏览器测试、卸载插件并检查界面恢复。
+
+单元测试有 33 项，安装后浏览器测试 13 项，卸载后测试 1 项。覆盖素材裁切、双向循环、五档计时、暂停、后台标签页、减少动态效果、偏好恢复、断网、浅深色和窄屏。
+
+测试基线为 Windows、DSH 0.1.2-rc.1、Chrome。构建目标为 Chrome 111+、Firefox 121+、Safari 16.4+，不表示已逐一实测。没有配置真实模型进行长篇流式会话测试。
+
+## 提交范围
+
+根目录 `.gitignore` 只放行完整版的源码、测试、素材、必要文档和当前安装包。Lite、历史包、依赖缓存、视频、测试配置及登录资料不属于这个仓库的提交范围。新建顶层文件时，需要明确决定是否加入规则。
+
+测试会生成本地 DSH 凭据；不要提交 `.lab/`、浏览器存储状态或失败测试的 trace。提交前检查文件列表，不要使用强制添加来绕过忽略规则。直接压缩整个工作目录或从网页拖入整个目录不会应用 `.gitignore`。

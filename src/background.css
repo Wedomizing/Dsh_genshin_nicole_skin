@@ -1,0 +1,137 @@
+/* All rules disappear when this plugin is disposed. Native color tokens stay intact. */
+body[data-dsh-genshin-nicole] {
+  isolation: isolate;
+}
+
+body[data-dsh-genshin-nicole] [data-nicole-background] {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  background: var(--dsw-alias-bg-base, #fff);
+}
+
+body[data-dsh-genshin-nicole] [data-nicole-layers] {
+  position: absolute;
+  inset: 0;
+  opacity: 0.30;
+}
+
+body[data-dsh-genshin-nicole] [data-nicole-background] img {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  max-width: none;
+  pointer-events: none;
+  object-fit: cover;
+  object-position: center;
+}
+
+body[data-dsh-genshin-nicole][data-ds-dark-theme] [data-nicole-layers] {
+  opacity: 0.42;
+}
+
+/* AppFrame is the direct owner of DSH's shell overlay, independent of CSS hashes.
+   Keep the sidebar, menus, editor, composer and code blocks on their native surfaces. */
+body[data-dsh-genshin-nicole] :has(> [data-shell-overlay]) { background-color: transparent; }
+body[data-dsh-genshin-nicole] [data-slot="conversation"],
+body[data-dsh-genshin-nicole] [data-slot="conversation"] > [data-phase],
+body[data-dsh-genshin-nicole] [data-conversation-scroll],
+body[data-dsh-genshin-nicole] [data-input-backdrop] {
+  background-color: transparent;
+}
+
+@media (max-width: 760px) {
+  body[data-dsh-genshin-nicole] [data-nicole-layers],
+  body[data-dsh-genshin-nicole][data-ds-dark-theme] [data-nicole-layers] {
+    opacity: 0.23;
+  }
+}
+
+body[data-dsh-genshin-nicole] [data-nicole-controls] {
+  position: fixed;
+  right: 14px;
+  bottom: 10px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 5px 3px 10px;
+  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  border-radius: 12px;
+  background: var(--dsw-alias-bg-base, #fff);
+  color: var(--dsw-alias-text-primary, #292b30);
+  font: 12px/1.4 system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 2px 12px #00000008;
+}
+body[data-dsh-genshin-nicole][data-ds-dark-theme] [data-nicole-controls] { color: #c9cbd0; }
+body[data-dsh-genshin-nicole] [data-nicole-status] { padding-right: 5px; opacity: 0.75; }
+body[data-dsh-genshin-nicole] [data-nicole-controls] button {
+  min-height: 30px;
+  padding: 3px 7px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+body[data-dsh-genshin-nicole] [data-nicole-controls] button:hover {
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}
+body[data-dsh-genshin-nicole] [data-nicole-controls] button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 1px;
+}
+body[data-dsh-genshin-nicole] [data-nicole-controls] button:disabled { opacity: 0.45; cursor: default; }
+
+/* A normal General Settings row, using the host's light/dark surface tokens. */
+body[data-dsh-genshin-nicole] [data-nicole-setting] {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 0.5px solid var(--dsw-alias-border-l2, #d9dce2);
+  color: var(--dsw-alias-label-primary, #292b30);
+}
+body[data-dsh-genshin-nicole] [data-nicole-setting-text] { flex: 1; min-width: 0; }
+body[data-dsh-genshin-nicole] [data-nicole-setting] label { font: 400 14px/22px system-ui, sans-serif; }
+body[data-dsh-genshin-nicole] [data-nicole-setting-description] {
+  margin-top: 4px;
+  color: var(--dsw-alias-label-tertiary, #727784);
+  font: 400 12px/18px system-ui, sans-serif;
+}
+body[data-dsh-genshin-nicole] [data-nicole-setting] select {
+  flex: none;
+  min-width: 100px;
+  height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 18px;
+  background-color: var(--dsw-alias-bg-module-platform, #f3f4f6);
+  color: inherit;
+  font: 400 14px/22px system-ui, sans-serif;
+  cursor: pointer;
+  color-scheme: light;
+}
+body[data-dsh-genshin-nicole][data-ds-dark-theme] [data-nicole-setting] select { color-scheme: dark; }
+body[data-dsh-genshin-nicole] [data-nicole-setting] select:hover {
+  background-color: var(--dsw-alias-interactive-bg-hover, #e7e9ee);
+}
+body[data-dsh-genshin-nicole] [data-nicole-setting] select:focus-visible {
+  outline: 2px solid var(--dsw-alias-label-primary, currentColor);
+  outline-offset: 2px;
+}
+@media (max-width: 420px) {
+  body[data-dsh-genshin-nicole] [data-nicole-setting] { align-items: flex-start; flex-direction: column; gap: 10px; }
+  body[data-dsh-genshin-nicole] [data-nicole-controls] { right: 8px; max-width: calc(100vw - 16px); flex-wrap: wrap; }
+}
+
+@media print {
+  body[data-dsh-genshin-nicole] [data-nicole-background],
+  body[data-dsh-genshin-nicole] [data-nicole-controls] { display: none; }
+}
