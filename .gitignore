@@ -15,6 +15,7 @@
 !/tests/
 !/docs/
 !/release/
+!/screenshots.json
 
 /assets/*
 !/assets/nicole-pv-frames/
