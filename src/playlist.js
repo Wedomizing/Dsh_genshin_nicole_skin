@@ -14,7 +14,11 @@ export function createPlaylist(entries, options) {
   let holdMs = validHold(options.holdMs) ? options.holdMs : 60000;
   const wrap = index => ((index % entries.length) + entries.length) % entries.length;
   const getState = () => ({ ...state });
-  const emit = () => { if (!disposed) onChange(getState()); };
+  // Rendering feedback is decorative and must never take the player down.
+  const emit = () => {
+    if (disposed) return;
+    try { onChange(getState()); } catch { /* keep playing regardless */ }
+  };
   const stopTimer = () => { if (timer !== undefined) cancel(timer); timer = undefined; };
   const load = index => Promise.resolve().then(() => {
     if (disposed) throw new Error('Playlist disposed before preload');
@@ -35,25 +39,38 @@ export function createPlaylist(entries, options) {
     state.phase = 'loading';
     emit();
     let succeeded = false;
-    for (let attempt = 0; attempt < entries.length; attempt++) {
-      const index = wrap(start + attempt * direction);
-      if (hasFrame && index === state.index) break;
-      const pending = warmed?.index === index ? warmed.promise : load(index);
-      warmed = undefined;
-      const result = await pending;
-      if (disposed) return;
-      if (!result.ok) continue;
-      state.phase = 'fading';
-      emit();
-      await show(entries[index], { payload: result.payload, initial: !hasFrame });
-      if (disposed) return;
-      state.index = index;
-      hasFrame = true;
-      succeeded = true;
-      break;
+    try {
+      for (let attempt = 0; attempt < entries.length; attempt++) {
+        const index = wrap(start + attempt * direction);
+        if (hasFrame && index === state.index) break;
+        const pending = warmed?.index === index ? warmed.promise : load(index);
+        warmed = undefined;
+        const result = await pending;
+        if (disposed) return;
+        if (!result.ok) continue;
+        state.phase = 'fading';
+        emit();
+        try {
+          await show(entries[index], { payload: result.payload, initial: !hasFrame });
+        } catch {
+          // A transition that throws is treated like a broken frame: skip it
+          // instead of wedging the player inside its busy window forever.
+          continue;
+        }
+        if (disposed) return;
+        state.index = index;
+        hasFrame = true;
+        succeeded = true;
+        break;
+      }
+    } finally {
+      // Whatever happened above, never leave the player busy forever.
+      if (!disposed) {
+        busy = false;
+        state.phase = succeeded ? 'idle' : 'error';
+      }
     }
-    busy = false;
-    state.phase = succeeded ? 'idle' : 'error';
+    if (disposed) return;
     emit();
     if (succeeded && entries.length > 1) {
       const index = (state.index + 1) % entries.length;
@@ -77,6 +94,9 @@ export function createPlaylist(entries, options) {
     },
     setPaused(value) { if (disposed) return; state.paused = Boolean(value); arm(); emit(); },
     setHidden(value) { if (disposed) return; state.hidden = Boolean(value); arm(); emit(); },
+    // Re-arm only when the dwell timer is genuinely missing (a window that came
+    // back from the tray/minimized can drop it); never restart a running dwell.
+    ensureArmed() { if (disposed || timer !== undefined) return; arm(); },
     dispose() { disposed = true; stopTimer(); warmed = undefined; },
   };
 }

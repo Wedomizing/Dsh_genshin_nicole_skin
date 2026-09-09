@@ -235,3 +235,44 @@ test('interval changes do not resume paused or hidden playback', async () => {
   assert.deepEqual(f.shown, ['a', 'b']);
   f.controller.dispose();
 });
+
+test('a show() that throws skips that frame instead of wedging the player busy', async () => {
+  const shown = [];
+  const f = fixture({
+    preload: async entry => entry.id,
+    show: async entry => {
+      if (entry.id === 'b') throw new Error('simulated transition failure');
+      shown.push(entry.id);
+    },
+  });
+  await f.controller.ready;
+  await f.controller.next();
+  assert.deepEqual(shown, ['a', 'c'], 'the throwing transition must be skipped');
+  assert.equal(f.controller.getState().phase, 'idle');
+  assert.equal(f.controller.getState().paused, false);
+  // Automatic rotation must continue after the skipped transition.
+  await f.advance(60000);
+  assert.deepEqual(shown, ['a', 'c', 'a']);
+  f.controller.dispose();
+});
+
+test('ensureArmed never restarts a running dwell and never starts paused or hidden playback', async () => {
+  const f = fixture();
+  await f.controller.ready;
+  f.controller.ensureArmed();
+  await f.advance(59999);
+  assert.deepEqual(f.shown, ['a'], 'a running dwell must not be shortened');
+  await f.advance(1);
+  assert.deepEqual(f.shown, ['a', 'b']);
+  f.controller.setPaused(true);
+  f.controller.ensureArmed();
+  await f.advance(180000);
+  assert.deepEqual(f.shown, ['a', 'b'], 'ensureArmed must respect the pause');
+  f.controller.setPaused(false);
+  f.controller.ensureArmed();
+  await f.advance(59999);
+  assert.deepEqual(f.shown, ['a', 'b']);
+  await f.advance(1);
+  assert.deepEqual(f.shown, ['a', 'b', 'c']);
+  f.controller.dispose();
+});

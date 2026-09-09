@@ -126,11 +126,20 @@ export function mountBackground(doc, frames, cssText, options = {}) {
   previous.addEventListener('click', () => { void player.previous(); });
   next.addEventListener('click', () => { void player.next(); });
   const onVisibility = () => player.setHidden(doc.hidden);
+  // Desktop windows that return from the tray or from minimized can lose the
+  // visibilitychange event. Focus is a reliable "the user is back" signal:
+  // re-check the hidden state and re-arm a dwell timer that was dropped while
+  // the page was hidden, without restarting one that is still running.
+  const onFocus = () => {
+    player.setHidden(doc.hidden);
+    player.ensureArmed();
+  };
   const onMotion = () => {
     player.setPaused(userPaused || reducedMotion.matches);
     if (reducedMotion.matches) animation?.finish();
   };
   doc.addEventListener('visibilitychange', onVisibility);
+  win.addEventListener('focus', onFocus);
   reducedMotion?.addEventListener('change', onMotion);
 
   function dispose() {
@@ -143,6 +152,7 @@ export function mountBackground(doc, frames, cssText, options = {}) {
     animation?.cancel();
     for (const abort of pendingLoads) abort();
     doc.removeEventListener('visibilitychange', onVisibility);
+    win.removeEventListener('focus', onFocus);
     reducedMotion?.removeEventListener('change', onMotion);
     background.remove();
     controls.remove();
