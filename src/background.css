@@ -37,15 +37,20 @@ body[data-dsh-genshin-nicole][data-ds-dark-theme] [data-nicole-layers] {
 /* AppFrame is the direct owner of DSH's shell overlay, independent of CSS hashes.
    Keep the sidebar, menus, editor, composer and code blocks on their native surfaces. */
 body[data-dsh-genshin-nicole] :has(> [data-shell-overlay]) { background-color: transparent; }
-body[data-dsh-genshin-nicole] [data-slot="conversation"],
-body[data-dsh-genshin-nicole] [data-slot="conversation"] > [data-phase],
+/* DSH 0.1.5 renamed the conversation slot from "conversation" to
+   "main.conversation" and the composer's outer container from
+   "[data-input-backdrop]" to "[data-input-scroll]". Match both names so the
+   same stylesheet keeps the native panels transparent on either host line. */
+body[data-dsh-genshin-nicole] :is([data-slot="conversation"], [data-slot="main.conversation"]),
+body[data-dsh-genshin-nicole] :is([data-slot="conversation"], [data-slot="main.conversation"]) > [data-phase],
 body[data-dsh-genshin-nicole] [data-conversation-scroll],
-body[data-dsh-genshin-nicole] [data-input-backdrop] {
+body[data-dsh-genshin-nicole] [data-input-backdrop],
+body[data-dsh-genshin-nicole] [data-input-scroll] {
   background-color: transparent;
 }
 
 /* Reveal the background around the composer; keep each card's own surface. */
-body[data-dsh-genshin-nicole] [data-slot="conversation"] > [data-phase="active"] [data-composer-seat] {
+body[data-dsh-genshin-nicole] :is([data-slot="conversation"], [data-slot="main.conversation"]) > [data-phase="active"] [data-composer-seat] {
   background: transparent;
 }
 

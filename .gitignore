@@ -34,6 +34,8 @@
 /docs/screenshots/*
 !/docs/screenshots/dsh-pv-0.3.0-light.png
 !/docs/screenshots/dsh-pv-0.3.0-dark.png
+!/docs/screenshots/dsh-pv-0.3.0-frame-07.png
+!/docs/screenshots/dsh-pv-0.3.0-frame-13.png
 !/docs/screenshots/dsh-pv-0.3.0-settings-light.png
 
 # Keep local historical packages and source archives out of Git.
@@ -44,6 +46,8 @@
 !/release/dsh-skin-genshin-nicole-0.3.5.sha256
 !/release/dsh-skin-genshin-nicole-0.3.6.tgz
 !/release/dsh-skin-genshin-nicole-0.3.6.sha256
+!/release/dsh-skin-genshin-nicole-0.3.7.tgz
+!/release/dsh-skin-genshin-nicole-0.3.7.sha256
 
 # Block sensitive/generated files inside allowed directories as well.
 node_modules/

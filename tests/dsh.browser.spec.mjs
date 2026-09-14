@@ -2,6 +2,10 @@ import { test, expect } from '@playwright/test';
 import { mkdir } from 'node:fs/promises';
 import sharp from 'sharp';
 
+// DSH 0.1.5 renamed the conversation slot from "conversation" to
+// "main.conversation". Match either so one suite covers both host lines.
+const CONVERSATION_ROOT = ':is([data-slot="conversation"], [data-slot="main.conversation"]) > [data-phase]';
+
 test.beforeEach(async ({ page }) => {
   // A fresh DSH opens the API-key prompt asynchronously after its welcome dialog.
   // Handle it when it actually appears, rather than racing a one-time isVisible().
@@ -26,10 +30,27 @@ async function openSkin(page) {
   return image;
 }
 
+// Walk the player to a frame with its own controls before a screenshot. A bare
+// localStorage write does not work: the skin persists its position while the
+// page unloads, so a reload would restore the frame it just saved, not ours.
+async function showFrame(page, timestamp) {
+  const root = page.locator('[data-nicole-background]');
+  const image = page.locator('[data-nicole-background] img').last();
+  for (let step = 0; step < 15; step++) {
+    if (await image.getAttribute('data-nicole-frame') === timestamp) break;
+    const before = await root.getAttribute('data-index');
+    await page.getByRole('button', { name: '下一张背景', exact: true }).click();
+    await expect(root).not.toHaveAttribute('data-index', before, { timeout: 10000 });
+  }
+  await expect(image).toHaveAttribute('data-nicole-frame', timestamp);
+  await image.evaluate((img) => img.decode());
+  return image;
+}
+
 // Exercise the installed host's real active-phase CSS without a model/API key.
 // Only the conversation content/state is simulated; never override its layering.
 async function showActiveConversationFixture(page, text) {
-  await page.locator('[data-slot="conversation"] > [data-phase]').evaluate((root, text) => {
+  await page.locator(CONVERSATION_ROOT).evaluate((root, text) => {
     root.dataset.phase = 'active';
     // Active DSH drops hero spacing and its heading/workspace row. Keeping them
     // would conceal collisions with the native send/stop button at the bottom.
@@ -141,12 +162,12 @@ test('floating player stays at the corner compact or turns vertical above the co
   const controls = page.locator('[data-nicole-controls]');
   const status = page.locator('[data-nicole-status]');
   const mode = () => controls.getAttribute('data-nicole-mode');
-  await expect(mode()).resolves.toBe('full');
+  await expect.poll(mode).toBe('full');
   await expect(status).toBeVisible();
 
   // An active composer owns the corner: drop the status text, keep the buttons.
   await showActiveConversationFixture(page, '输入区尺寸与会话切换回归。');
-  await expect(mode()).resolves.toBe('compact');
+  await expect.poll(mode).toBe('compact');
   await expect(status).toBeHidden();
   await expect(controls).toHaveCSS('bottom', '10px');
   const cardBox = await page.locator('[data-composer-card]').boundingBox();
@@ -164,17 +185,17 @@ test('floating player stays at the corner compact or turns vertical above the co
     card.replaceWith(replacement);
   });
   await expect(controls).toHaveCSS('bottom', '10px');
-  await expect(mode()).resolves.toBe('compact');
+  await expect.poll(mode).toBe('compact');
 
   // Wide screens keep the full row at the corner.
   await page.setViewportSize({ width: 1909, height: 905 });
-  await expect(mode()).resolves.toBe('full');
+  await expect.poll(mode).toBe('full');
   await expect(status).toBeVisible();
   await expect(controls).toHaveCSS('bottom', '10px');
 
   // A portrait composer owns the whole corner: become a slim column above it.
   await page.setViewportSize({ width: 390, height: 844 });
-  await expect(mode()).resolves.toBe('vertical');
+  await expect.poll(mode).toBe('vertical');
   await expect(controls).toHaveCSS('flex-direction', 'column');
   await expect(status).toBeHidden();
   const gap = () => page.evaluate(() => {
@@ -199,15 +220,13 @@ test('the installed wallpaper is visible through the actual DSH conversation sur
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toHaveCount(0);
   expect(await image.evaluate((img) => [img.naturalWidth, img.naturalHeight])).toEqual([1920, 864]);
-  await expect(page.locator('[data-slot="conversation"] > [data-phase]')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await expect(page.locator(CONVERSATION_ROOT)).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
   const options = { animations: 'disabled', caret: 'hide', clip: { x: 1080, y: 160, width: 260, height: 210 } };
   const withWallpaper = await page.screenshot(options);
   await page.locator('[data-nicole-background]').evaluate((el) => { el.style.visibility = 'hidden'; });
   const withoutWallpaper = await page.screenshot(options);
   expect(withWallpaper.equals(withoutWallpaper), 'the actual pixels must change when the wallpaper is hidden').toBe(false);
   await page.locator('[data-nicole-background]').evaluate((el) => { el.style.removeProperty('visibility'); });
-  await mkdir('docs/screenshots', { recursive: true });
-  await page.screenshot({ path: 'docs/screenshots/dsh-pv-0.3.0-light.png', animations: 'disabled', caret: 'hide' });
   expect(errors).toEqual([]);
 });
 
@@ -230,7 +249,35 @@ test('native appearance controls switch the background to dark mode', async ({ p
   await expect(page.locator('[data-nicole-layers]')).toHaveCSS('opacity', '0.42');
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toHaveCount(0);
-  await page.screenshot({ path: 'docs/screenshots/dsh-pv-0.3.0-dark.png', animations: 'disabled', caret: 'hide' });
+});
+
+// The published storefront screenshots come from four different frames, so the
+// README and the plugin market do not show the same first frame four times.
+// Getting there uses the real player controls, which is why this is the one
+// test that is allowed to run long.
+test('publish storefront screenshots from four different frames', async ({ page }) => {
+  test.slow();
+  await mkdir('docs/screenshots', { recursive: true });
+  await openSkin(page);
+  const theme = async (name) => {
+    await page.getByRole('button', { name: '设置', exact: true }).click();
+    await page.getByRole('button', { name, exact: true }).click();
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+  };
+  const shot = (file) => page.screenshot({ path: `docs/screenshots/dsh-pv-0.3.0-${file}.png`, animations: 'disabled', caret: 'hide' });
+
+  await theme('浅色');
+  await showFrame(page, '01:30'); // frame 10 — the brightest of the four
+  await shot('light');
+
+  await theme('深色');
+  await showFrame(page, '01:17'); // frame 7
+  await shot('frame-07');
+  await showFrame(page, '01:18'); // frame 8
+  await shot('dark');
+  await showFrame(page, '01:44'); // frame 13 — the character close-up
+  await shot('frame-13');
 });
 
 test('narrow screens keep the artwork without introducing horizontal scrolling', async ({ page }) => {
@@ -246,7 +293,7 @@ test('narrow screens keep the artwork without introducing horizontal scrolling',
 
 test('the two-second crossfade blends actual pixels without a blank frame or layout shift', async ({ page }) => {
   await openSkin(page);
-  const host = page.locator('[data-slot="conversation"] > [data-phase]');
+  const host = page.locator(CONVERSATION_ROOT);
   const beforeBox = await host.boundingBox();
   const clip = { x: 1080, y: 160, width: 240, height: 180 };
   const before = await page.screenshot({ clip, caret: 'hide' });
