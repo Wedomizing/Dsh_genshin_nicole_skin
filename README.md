@@ -26,7 +26,7 @@
 
 ![第 13 张画面，深色模式](docs/screenshots/dsh-pv-0.3.0-frame-13.png)
 
-截图来自实际 DSH 页面。当前版本为 **0.3.7**：跟随 DSH 新版把对话区改名成 `main.conversation`、输入区外圈容器改成 `[data-input-scroll]`，背景在这些版本上同样从输入区外圈露出；皮肤挂载、设置项注册或清理一旦出错只记日志，不再影响宿主页面。背景、轮播顺序和切换时间没有改动。
+截图来自实际 DSH 页面。当前版本为 **0.3.8**：在 DSH `0.2.0`（桌面版 2.0.17 内置的宿主）上跑完整轮验收，对话区、输入区容器和设置项的接入点都没有变化，背景照常从输入区外圈露出；兼容声明同时覆盖 `0.1.2`–`0.2.0` 的候选版与正式版。皮肤挂载、设置项注册或清理一旦出错只记日志，不再影响宿主页面。背景、轮播顺序和切换时间没有改动。
 
 ## 能做什么
 
@@ -42,10 +42,10 @@
 
 先确认 DSH Web 能正常启动，并且已经安装了 DSH 插件管理需要的 pnpm。这是 Web 界面的皮肤，不改变终端界面。
 
-下载 [0.3.7 安装包](release/dsh-skin-genshin-nicole-0.3.7.tgz)，不用解压。在安装包所在文件夹打开终端，运行：
+下载 [0.3.8 安装包](release/dsh-skin-genshin-nicole-0.3.8.tgz)，不用解压。在安装包所在文件夹打开终端，运行：
 
 ```powershell
-dsh plugin --profile web add "./dsh-skin-genshin-nicole-0.3.7.tgz"
+dsh plugin --profile web add "./dsh-skin-genshin-nicole-0.3.8.tgz"
 ```
 
 安装后重启 DSH，再刷新浏览器，背景就会出现：
@@ -54,7 +54,7 @@ dsh plugin --profile web add "./dsh-skin-genshin-nicole-0.3.7.tgz"
 dsh web
 ```
 
-如果下载的是整个仓库，在仓库根目录安装时，路径写成 `./release/dsh-skin-genshin-nicole-0.3.7.tgz`。如果你用的 profile 不叫 `web`，把命令里的 `web` 换成自己的名称，并用平时启动该 profile 的方式打开 DSH。
+如果下载的是整个仓库，在仓库根目录安装时，路径写成 `./release/dsh-skin-genshin-nicole-0.3.8.tgz`。如果你用的 profile 不叫 `web`，把命令里的 `web` 换成自己的名称，并用平时启动该 profile 的方式打开 DSH。
 
 安装成品不需要编译源码，也不需要为皮肤配置 API key。目前通过本地 `.tgz` 包安装，尚未发布到 npm。请先停用其他背景皮肤；如果装过 Nicole Lite，也请先卸载 Lite，避免两层背景叠在一起。
 
@@ -78,7 +78,7 @@ dsh plugin --profile web remove dsh-skin-genshin-nicole
 
 ## 兼容与开发
 
-已在 Windows、DSH `0.1.5-rc.1` 和 Chrome 上测试过安装、轮播、明暗切换、窄屏及卸载，`0.1.2-rc.1` 上也回归通过。其他 DSH 版本、Firefox 和 Safari 尚未实测，请使用支持 `:has()` 和 `color-mix()` 的现代浏览器。
+已在 Windows、DSH `0.2.0-rc.2`（桌面版 2.0.17 内置的宿主）和 Chrome 上测试过安装、轮播、明暗切换、窄屏及卸载；`0.1.5-rc.1` 与 `0.1.2-rc.1` 上也回归通过。其他 DSH 版本、Firefox 和 Safari 尚未实测，请使用支持 `:has()` 和 `color-mix()` 的现代浏览器。
 
 想自己改图片或调整样式，需要 Node.js 22.19 或更高版本：
 

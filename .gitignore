@@ -48,6 +48,8 @@
 !/release/dsh-skin-genshin-nicole-0.3.6.sha256
 !/release/dsh-skin-genshin-nicole-0.3.7.tgz
 !/release/dsh-skin-genshin-nicole-0.3.7.sha256
+!/release/dsh-skin-genshin-nicole-0.3.8.tgz
+!/release/dsh-skin-genshin-nicole-0.3.8.sha256
 
 # Block sensitive/generated files inside allowed directories as well.
 node_modules/
